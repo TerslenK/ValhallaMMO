@@ -202,7 +202,7 @@ public class SkillTreeMenu extends Menu {
     @Override
     public void setMenuItems() {
         inventory.clear();
-        setScrollBar();
+        inventory.setItem(49, new ItemStack(Material.BARRIER, "Go Back"));
         if (selectedSkill != null && skillTreeItems.containsKey(selectedSkill)){
             ItemStack[][] treeView = getSkillTreeView(selectedSkill);
             if (!ArrayUtils.isEmpty(treeView)){
@@ -227,66 +227,6 @@ public class SkillTreeMenu extends Menu {
                 inventory.setItem(36, directionSW);
                 inventory.setItem(40, directionS);
                 inventory.setItem(44, directionSE);
-            }
-        }
-    }
-
-    private void setScrollBar(){
-        List<ItemStack> icons = new ArrayList<>(skillIcons);
-        int iconsSize = icons.size();
-        for (ItemStack i : skillIcons){
-            if (ItemUtils.isEmpty(i)) continue;
-            ItemMeta meta = ItemUtils.getItemMeta(i);
-            if (meta == null) continue;
-            String storedType = getItemStoredSkillType(meta);
-            if (storedType != null){
-                Skill s = SkillRegistry.getSkill(storedType);
-                if (s != null) {
-                    PowerProfile acc = ProfileRegistry.getMergedProfile(target, PowerProfile.class);
-                    meta.setDisplayName(Utils.chat(s.getDisplayName() + (acc.getNewGamePlus() > 0 ?
-                            TranslationManager.getTranslation("prestige_level_format")
-                                    .replace("%prestige_roman%", StringUtils.toRoman(acc.getNewGamePlus())
-                                            .replace("%prestige_numeric%", String.valueOf(acc.getNewGamePlus()))) :
-                            "")));
-
-                    Profile p = ProfileRegistry.getPersistentProfile(target, s.getProfileType());
-                    double expRequired = s.expForLevel(p.getLevel() + 1);
-                    List<String> lore = new ArrayList<>();
-                    for (String line : TranslationManager.getListTranslation("skilltree_icon_format")){
-                        lore.add(Utils.chat(line
-                                .replace("%level_current%", "" + p.getLevel())
-                                .replace("%exp_current%", String.format("%.2f", p.getEXP()))
-                                .replace("%exp_next%", (expRequired < 0) ? TranslationManager.getTranslation("max_level") : String.format("%.2f", expRequired))
-                                .replace("%exp_total%", String.format("%.2f", p.getTotalEXP()))
-                                .replace("%prestigepoints%", String.valueOf((acc.getSpendablePrestigePoints() - acc.getSpentPrestigePoints())))
-                                .replace("%skillpoints%", String.valueOf((acc.getSpendableSkillPoints() - acc.getSpentSkillPoints())))));
-                    }
-                    meta.setLore(lore);
-                    meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ConventionUtils.getHidePotionEffectsFlag(), ItemFlag.HIDE_DYE, ItemFlag.HIDE_ENCHANTS);
-                    meta.setAttributeModifiers(null);
-                    ItemUtils.setItemMeta(i, meta);
-                }
-            }
-        }
-        if (iconsSize > 0){
-            for (int i = 0; i < SkillRegistry.getAllSkills().size(); i++){
-                for (int o = 0; o < 9; o++){
-                    if (o >= skillIcons.size()) break;
-                    ItemStack iconToPut = skillIcons.get(o);
-                    inventory.setItem(45 + o, iconToPut);
-                }
-                ItemStack centerItem = inventory.getItem(49);
-                if (centerItem != null){
-                    ItemMeta meta = ItemUtils.getItemMeta(centerItem);
-                    if (meta == null) continue;
-                    String stored = getItemStoredSkillType(meta);
-                    if (stored != null){
-                        if (stored.equals(this.selectedSkill.getType())){
-                            break;
-                        }
-                    }
-                }
-                Collections.rotate(skillIcons, 1);
             }
         }
     }
