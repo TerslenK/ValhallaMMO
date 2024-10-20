@@ -202,7 +202,7 @@ public class SkillTreeMenu extends Menu {
     @Override
     public void setMenuItems() {
         inventory.clear();
-        inventory.setItem(49, new ItemStack(Material.BARRIER, "Go Back"));
+        inventory.setItem(49, new ItemStack(Material.BARRIER));
         if (selectedSkill != null && skillTreeItems.containsKey(selectedSkill)){
             ItemStack[][] treeView = getSkillTreeView(selectedSkill);
             if (!ArrayUtils.isEmpty(treeView)){
